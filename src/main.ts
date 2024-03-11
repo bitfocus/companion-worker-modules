@@ -98,6 +98,8 @@ const main = async () => {
 	}
 
 	if (fs.existsSync('./tmp/companion/module-legacy')) {
+		const addedPackages = new Set(packages.map((p) => p.name))
+
 		// Run yarn in the companion folder
 		console.log('[4] Running yarn')
 		try {
@@ -138,6 +140,9 @@ const main = async () => {
 						errors.push(['sub-package.json', err])
 					}
 
+					const name = key.replace('companion-module-', '')
+					if (addedPackages.has(name)) return
+
 					packages.push({
 						version: package_json.dependencies[key].split(/#v?/)[1],
 						help_link: `https://github.com/bitfocus/${key}/blob/${
@@ -146,7 +151,7 @@ const main = async () => {
 						help_url: `https://raw.githubusercontent.com/bitfocus/${key}/${
 							package_json.dependencies[key].split(/#/)[1]
 						}/HELP.md`,
-						name: key.replace('companion-module-', ''),
+						name: name,
 						url: package_json.dependencies[key],
 						api_version: sub_package_json.api_version,
 						keywords: sub_package_json.keywords,
